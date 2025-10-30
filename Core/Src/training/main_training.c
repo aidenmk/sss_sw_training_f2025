@@ -19,14 +19,17 @@
 int main(void)
 {
 	setup_training();
-
-	int count = 0;
+	rcc_enable(GPIO_C_ENABLE);
+	gpio_configureMode(LED_PORT, LED_PIN, GPIO_OUTPUT_PUSH_PULL, GPIO_MED_SPEED);
 
 	/* Infinite loop */
 	while (1)
 	{
+	  gpio_low(LED_PORT, LED_PIN);
 	  HAL_Delay(1000);
-	  printMsg("Hello #%d\r\n", count++);
+	  gpio_high(LED_PORT, LED_PIN);
+	  HAL_Delay(1000);
+
 	}
 }
 
