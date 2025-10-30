@@ -17,14 +17,12 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <stdio.h>
-
 #include "main.h"
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdarg.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,6 +42,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart1;
+
 osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
 
@@ -66,15 +65,18 @@ const uint16_t uartTxBufMaxLen = sizeof(uartTxBuf);
 
 void printMsg(const char *message, ...) {
 	va_list args;
+	va_start (args, message);
+	va_end (args);
 //	uint16_t usbTxBufLen = snprintf((char *) usbTxBuf, usbTxBufMaxLen, message, args);
 //	CDC_Transmit_FS(usbTxBuf, usbTxBufLen);
 
-	uint16_t uartTxBufLen = snprintf((char *) uartTxBuf, uartTxBufMaxLen, message, args);
+	uint16_t uartTxBufLen = vsnprintf((char *) uartTxBuf, uartTxBufMaxLen, message, args);
 
 	HAL_StatusTypeDef hal_status = HAL_BUSY;
 	while(hal_status != HAL_OK) {
 		hal_status = HAL_UART_Transmit(&huart1, uartTxBuf, uartTxBufLen, 50);
 	}
+
 }
 /* USER CODE END 0 */
 
@@ -144,14 +146,14 @@ void setup_training(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  return;
-  while (1)
-  {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
+//  return;
+//  while (1)
+//  {
+//    /* USER CODE END WHILE */
+//
+//    /* USER CODE BEGIN 3 */
+//  }
+//  /* USER CODE END 3 */
 }
 
 /**
@@ -233,13 +235,25 @@ static void MX_USART1_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
 
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
